@@ -15,21 +15,85 @@ class Calculator extends React.Component {
             temp: 0,
             resetDisplay: false
         }
+        this.clearDisplay = this.clearDisplay.bind(this)
     }
+
+
     //class method
     updateHeader(val){
-        //sets header property on state to new val
         this.setState({header: val});
     }
     //new class method
+    //adds a str number to display state if its < 13 chars if it isnt then it wont add anymore
     setDisplay(num){
-        this.setState({display: this.state.display + num})
+
+        if(this.state.resetDisplay)
+        {this.clearDisplay()}
+
+        var display = ( this.state.display === '0' ) ? num : this.state.display + num;
+        this.setState({ display: (this.state.display.length < 13) ? display : this.state.display })
+        console.log('display= ' + this.state.resetDisplay)
+        console.log(this.state.display)
+        console.log(this.state.temp)
     }
+    //
+    setOperator(operator) {
+        if ( !this.state.operator ) {
+          this.setState({ 
+            operator: operator, 
+            temp: parseInt(this.state.display, 10), 
+            display: '0' });
+        }
+    }
+
+    calculate(){
+        if(this.state.operator === ''){
+            return;
+        }
+        var result
+        switch(this.state.operator){
+            case '+':
+            result = this.state.temp + parseInt(this.state.display, 10);
+            break;
+            case '-':
+            result = this.state.temp - parseInt(this.state.display, 10);
+            break;
+            case '*':
+            result = this.state.temp * parseInt(this.state.display, 10);
+            break;
+            case '/':
+            result = this.state.temp / parseInt(this.state.display, 10);
+            break;
+            default:
+            break;
+        }
+
+        this.setState({ display: String(result),
+        resetDisplay: true});
+        console.log('calculate= ' + this.state.resetDisplay)
+        console.log(this.state.display)
+        console.log(this.state.temp)
+    }
+    
+    clearDisplay(){
+        this.setState({display: '0', temp: 0, operator: '', resetDisplay: false});
+        console.log('equals= ' + this.state.resetDisplay)
+        console.log(this.state.display)
+        console.log(this.state.temp)
+    }
+
+
+
+
+
+
+
+
+
+
     render () {
         return (
             <div id="calculator-container">
-            {/* add an onChange event to input element.. with an id of #header-input
-            make its val be an arrow function that recieves param 'e' (changeEvent) */}
             <input id="header-input" onChange={ (e) => {
             //call updateHeader and pass in val from event
             this.updateHeader(e.target.value);}}/>
@@ -41,7 +105,7 @@ class Calculator extends React.Component {
             <span className="total">{this.state.display}</span>
           </div>
 
-          <div className="btn clear"></div>
+          <div className="btn clear" onClick={()=> {this.clearDisplay()}}></div>
 
           <div className="btn zero" onClick={() => { this.setDisplay('0')}}></div>
           <div className="btn one" onClick={() => { this.setDisplay('1')}}></div>
@@ -54,11 +118,12 @@ class Calculator extends React.Component {
           <div className="btn eight" onClick={() => { this.setDisplay('8')}}></div>
           <div className="btn nine" onClick={() => { this.setDisplay('9')}}></div>
 
-          <div className="btn equal"></div>
-          <div className="btn multiply"></div>
-          <div className="btn divide"></div>
-          <div className="btn subtract"></div>
-          <div className="btn add"></div>
+          <div className="btn equal" onClick={ () => {
+              this.calculate('=');}}></div>
+          <div className="btn multiply" onClick={ () => { this.setOperator('*'); } }></div>
+          <div className="btn divide"   onClick={ () => { this.setOperator('/'); } }></div>
+          <div className="btn subtract" onClick={ () => { this.setOperator('-'); } }></div>
+          <div className="btn add"      onClick={ () => { this.setOperator('+'); } }></div>
             </div>
             </div>
         )
